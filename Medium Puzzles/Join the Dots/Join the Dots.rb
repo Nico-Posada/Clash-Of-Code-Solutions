@@ -37,7 +37,7 @@ public def results
     puts self.join.rstrip
 end
 
-letters = [*1..9].join+[*?A..?Z]*''
+letters = [*1..9]*''+[*?A..?Z]*''
 
 h, w = gets.split.map &:to_i
 points = {}
