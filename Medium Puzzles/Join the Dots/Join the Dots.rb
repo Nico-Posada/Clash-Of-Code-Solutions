@@ -1,5 +1,5 @@
-def connect(grid, start, go_to)
-    grid[ start[1] ][ start[0] ] = ?o
+def connect(start, go_to)
+    @grid[ start[1] ][ start[0] ] = ?o
     shouldStar = -> (char, expected) { "X+*".include?(char) || 
                                      ("-|".include?(char) && "\\/".include?(expected)) ||
                                      ("-|".include?(expected) && "\\/".include?(char)) }
@@ -12,7 +12,7 @@ def connect(grid, start, go_to)
         start[1] += y
 
         result = ''
-        chr = grid[ start[1] ][ start[0] ]
+        chr = @grid[ start[1] ][ start[0] ]
 
         if x == 0
             result = chr == ?- ? ?+ : ?|
@@ -25,10 +25,9 @@ def connect(grid, start, go_to)
         end
 
         result = ?* if (shouldStar.call(chr, result))
-        grid[ start[1] ][ start[0] ] = result
+        @grid[ start[1] ][ start[0] ] = result
     end
-    grid[ go_to[1] ][ go_to[0] ] = ?o
-    return grid
+    @grid[ go_to[1] ][ go_to[0] ] = ?o
 end
 
 public def results
@@ -42,13 +41,13 @@ letters = [*1..9].join+[*?A..?Z]*''
 
 h, w = gets.split.map &:to_i
 points = {}
-grid = []
+@grid = []
 
 h.times do |y|
   row = gets.chomp.chars
   pts = (0...w).find_all{ letters.include? row[_1] }
   pts.each{|x| points.store(row[x], [x, y]) }
-  grid << row
+  @grid << row
 end
 points = points.sort_by{ letters.index(_1[0]) }.to_h
 
@@ -56,6 +55,6 @@ for i in 1...points.size
     start = points[ letters[i-1] ]
     go_to = points[ letters[i]   ]
 
-    grid = connect(grid, start, go_to)
+    connect(start, go_to)
 end
-grid.map &:results
+@grid.map &:results
