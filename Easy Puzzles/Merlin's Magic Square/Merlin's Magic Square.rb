@@ -66,5 +66,3 @@ for i in 1..9
         exit
     end
 end
-
-p grid
