@@ -1,3 +1,4 @@
+# crappy but whatever
 def play(grid, num)
     case num.to_i
     when 1
@@ -59,8 +60,8 @@ end
 win = [[1,1,1],[1,0,1],[1,1,1]]
 for i in 1..9
     # have to clone grid to avoid the original grid getting modified
-    clone = [grid[0][0..], grid[1][0..], grid[2][0..]]
-    
+    clone = Marshal.load(Marshal.dump(grid))
+
     if win == play(clone, i)
         puts i
         exit
