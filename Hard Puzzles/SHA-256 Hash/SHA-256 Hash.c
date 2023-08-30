@@ -27,23 +27,22 @@ int main()
     };
     
     const unsigned str_len = strlen(message);
-    const unsigned bit_len = str_len * 8U;
+    const unsigned bit_len = str_len << 3;
 
     // init bitsets
     const unsigned to_alloc = _512_BIT_CHUNK_SIZE * ((unsigned char)(bit_len >> 9) + 1);
-    unsigned char* bitsets = malloc(to_alloc);
-    memset(bitsets, 0, to_alloc);
+    unsigned char* bytes = malloc(to_alloc);
 
     // append the string
-    memcpy(bitsets, message, str_len);
+    memcpy(bytes, message, str_len);
 
     // do the rest of SHA-256 boilerplate
-    bitsets[str_len] = 0b10000000;
+    bytes[str_len] = 0b10000000;
     int cur_size = str_len;
     while (cur_size % _512_BIT_CHUNK_SIZE != 60)
-        bitsets[++cur_size] = 0U;
+        bytes[++cur_size] = 0U;
 
-    *(unsigned*)&bitsets[cur_size] = _bswap(bit_len);
+    *(unsigned*)&bytes[cur_size] = _bswap(bit_len);
     cur_size += 4;
 
     // perform compression and getting hash value for each chunk
@@ -52,10 +51,10 @@ int main()
     {
         int offset = chunk * _512_BIT_CHUNK_SIZE;
 
-        // convert to bitsets of size 32
+        // convert to unsigned ints
         unsigned bitsets_32[_512_BIT_CHUNK_SIZE] = {0};
-        for (int i = offset; i < _512_BIT_CHUNK_SIZE + offset; i += 4)
-            bitsets_32[(i/4) & 0xF] = _bswap(*(unsigned*)&bitsets[i]);
+        for (int i = offset; i < _512_BIT_CHUNK_SIZE + offset; i += sizeof(unsigned))
+            bitsets_32[i >> 2 & 0xF] = _bswap(*(unsigned*)&bytes[i]);
 
         // perform the first chunk thingy idk
         for (int i = 16; i < _512_BIT_CHUNK_SIZE; ++i)
@@ -102,5 +101,5 @@ int main()
     for (int i = 0; i < sizeof(hashes) / sizeof(unsigned); ++i)
         printf("%08x", hashes[i]);
 
-    free(bitsets);
+    free(bytes);
 }
