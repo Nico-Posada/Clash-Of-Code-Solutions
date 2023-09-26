@@ -1,0 +1,1 @@
+link: https://www.codingame.com/training/easy/moves-in-maze
